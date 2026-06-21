@@ -3,11 +3,12 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import pyperclip
 import webbrowser
+import random
 
 st.set_page_config(page_title="Grok Playlist", page_icon="🎵")
 
 st.title("🎵 Grok Playlist Creator")
-st.write("Recomendações melhores")
+st.write("Busca simples e confiável")
 
 CLIENT_ID = "8a48218f1d5948e3b4e32f2461574df0"
 CLIENT_SECRET = "ba27eb8411de4a6e89f327cea6cb1e88"
@@ -21,19 +22,16 @@ genero = st.text_input("Gênero musical", value="trap")
 quantidade = st.slider("Quantidade de músicas", 5, 40, 20)
 
 if st.button("🔥 Gerar Playlist", type="primary"):
-    with st.spinner(f"Gerando recomendações de {genero}..."):
+    with st.spinner(f"Buscando {quantidade} músicas de {genero}..."):
         try:
-            # Usa recommendations (melhor que search simples)
-            results = sp.recommendations(
-                seed_genres=[genero.lower()],
-                limit=quantidade,
-                min_popularity=60   # Tenta pegar músicas mais conhecidas
-            )
+            # Offset aleatório pra variar as músicas
+            offset = random.randint(0, 80)
+            results = sp.search(q=f"genre:{genero}", type="track", limit=quantidade, offset=offset)
             
-            tracks = results['tracks']
+            tracks = results['tracks']['items']
             
             if tracks:
-                st.success(f"Encontrei {len(tracks)} recomendações!")
+                st.success(f"Encontrei {len(tracks)} músicas!")
                 
                 links = []
                 for i, track in enumerate(tracks, 1):
@@ -51,8 +49,8 @@ if st.button("🔥 Gerar Playlist", type="primary"):
                 
                 st.info("Abra o Spotify → Crie uma playlist nova → Cole os links")
             else:
-                st.error("Não encontrou recomendações. Tente outro gênero.")
+                st.error("Não encontrei músicas para esse gênero. Tente outro.")
         except Exception as e:
-            st.error("Erro ao buscar recomendações. Tente outro gênero.")
+            st.error("Erro na busca. Tente outro gênero.")
 
-st.caption("Feito pelo Grok • Recomendações")
+st.caption("Feito pelo Grok")
