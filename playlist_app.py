@@ -7,8 +7,9 @@ import webbrowser
 st.set_page_config(page_title="Grok Playlist", page_icon="🎵")
 
 st.title("🎵 Grok Playlist Creator")
-st.write("Versão simples e estável")
+st.write("Versão simples (sem login)")
 
+# Client Credentials (mais estável no Cloud)
 CLIENT_ID = "8a48218f1d5948e3b4e32f2461574df0"
 CLIENT_SECRET = "ba27eb8411de4a6e89f327cea6cb1e88"
 
@@ -21,39 +22,42 @@ genero = st.text_input("Gênero musical", value="trap")
 quantidade = st.slider("Quantidade de músicas", 5, 30, 15)
 
 if st.button("🔥 Gerar Playlist", type="primary"):
-    with st.spinner(f"Buscando músicas de {genero}..."):
-        results = sp.search(q=genero, type="track", limit=30)
-        
-        tracks = results['tracks']['items']
-        seen = set()
-        unique_tracks = []
-        
-        for track in tracks:
-            if track['id'] not in seen:
-                seen.add(track['id'])
-                unique_tracks.append(track)
-            if len(unique_tracks) >= quantidade:
-                break
-        
-        if unique_tracks:
-            st.success(f"Encontrei {len(unique_tracks)} músicas!")
+    with st.spinner(f"Buscando {quantidade} músicas de {genero}..."):
+        try:
+            results = sp.search(q=genero, type="track", limit=quantidade)
             
-            links = []
-            for i, track in enumerate(unique_tracks, 1):
-                nome = track['name']
-                artista = track['artists'][0]['name']
-                link = track['external_urls']['spotify']
-                links.append(link)
-                st.write(f"**{i}.** {nome} - {artista}")
+            tracks = results['tracks']['items']
+            seen = set()
+            unique_tracks = []
             
-            pyperclip.copy("\n".join(links))
-            st.success("✅ Links copiados para o clipboard!")
+            for track in tracks:
+                if track['id'] not in seen:
+                    seen.add(track['id'])
+                    unique_tracks.append(track)
+                if len(unique_tracks) >= quantidade:
+                    break
             
-            if st.button("🚀 Abrir Spotify"):
-                webbrowser.open(f"https://open.spotify.com/search/{genero}")
-            
-            st.info("Abra o Spotify e cole os links na sua playlist.")
-        else:
-            st.error("Não encontrei músicas para esse gênero.")
+            if unique_tracks:
+                st.success(f"Encontrei {len(unique_tracks)} músicas!")
+                
+                links = []
+                for i, track in enumerate(unique_tracks, 1):
+                    nome = track['name']
+                    artista = track['artists'][0]['name']
+                    link = track['external_urls']['spotify']
+                    links.append(link)
+                    st.write(f"**{i}.** {nome} - {artista}")
+                
+                pyperclip.copy("\n".join(links))
+                st.success("✅ Links copiados!")
+                
+                if st.button("🚀 Abrir Spotify"):
+                    webbrowser.open(f"https://open.spotify.com/search/{genero}")
+                
+                st.info("Abra o Spotify → Crie uma playlist nova → Cole os links")
+            else:
+                st.error("Não encontrei músicas.")
+        except Exception as e:
+            st.error("Erro ao buscar músicas. Tente outro gênero.")
 
 st.caption("Feito pelo Grok")
