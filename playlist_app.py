@@ -7,9 +7,8 @@ import webbrowser
 st.set_page_config(page_title="Grok Playlist", page_icon="🎵")
 
 st.title("🎵 Grok Playlist Creator")
-st.write("Gera playlists sem complicação")
+st.write("Versão simples e estável")
 
-# ================= CREDENCIAIS =================
 CLIENT_ID = "8a48218f1d5948e3b4e32f2461574df0"
 CLIENT_SECRET = "ba27eb8411de4a6e89f327cea6cb1e88"
 
@@ -19,11 +18,11 @@ sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
 ))
 
 genero = st.text_input("Gênero musical", value="trap")
-quantidade = st.slider("Quantidade de músicas", 5, 50, 20)
+quantidade = st.slider("Quantidade de músicas", 5, 30, 15)
 
 if st.button("🔥 Gerar Playlist", type="primary"):
-    with st.spinner(f"Buscando {quantidade} músicas de {genero}..."):
-        results = sp.search(q=genero, type="track", limit=quantidade + 15)
+    with st.spinner(f"Buscando músicas de {genero}..."):
+        results = sp.search(q=genero, type="track", limit=30)
         
         tracks = results['tracks']['items']
         seen = set()
@@ -48,13 +47,13 @@ if st.button("🔥 Gerar Playlist", type="primary"):
                 st.write(f"**{i}.** {nome} - {artista}")
             
             pyperclip.copy("\n".join(links))
-            st.success("✅ Links copiados!")
+            st.success("✅ Links copiados para o clipboard!")
             
             if st.button("🚀 Abrir Spotify"):
                 webbrowser.open(f"https://open.spotify.com/search/{genero}")
             
-            st.info("Abra o Spotify → Crie uma playlist nova → Cole os links")
+            st.info("Abra o Spotify e cole os links na sua playlist.")
         else:
-            st.error("Não encontrei músicas.")
+            st.error("Não encontrei músicas para esse gênero.")
 
 st.caption("Feito pelo Grok")
