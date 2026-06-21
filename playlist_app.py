@@ -7,9 +7,8 @@ import webbrowser
 st.set_page_config(page_title="Grok Playlist", page_icon="🎵")
 
 st.title("🎵 Grok Playlist Creator")
-st.write("Versão simples (sem login)")
+st.write("Versão simples")
 
-# Client Credentials (mais estável no Cloud)
 CLIENT_ID = "8a48218f1d5948e3b4e32f2461574df0"
 CLIENT_SECRET = "ba27eb8411de4a6e89f327cea6cb1e88"
 
@@ -24,7 +23,8 @@ quantidade = st.slider("Quantidade de músicas", 5, 30, 15)
 if st.button("🔥 Gerar Playlist", type="primary"):
     with st.spinner(f"Buscando {quantidade} músicas de {genero}..."):
         try:
-            results = sp.search(q=genero, type="track", limit=quantidade)
+            # Busca por gênero (corrigido)
+            results = sp.search(q=f"genre:{genero}", type="track", limit=quantidade)
             
             tracks = results['tracks']['items']
             seen = set()
@@ -56,8 +56,8 @@ if st.button("🔥 Gerar Playlist", type="primary"):
                 
                 st.info("Abra o Spotify → Crie uma playlist nova → Cole os links")
             else:
-                st.error("Não encontrei músicas.")
+                st.error("Não encontrei músicas para esse gênero.")
         except Exception as e:
-            st.error("Erro ao buscar músicas. Tente outro gênero.")
+            st.error("Erro ao buscar. Tente outro gênero.")
 
 st.caption("Feito pelo Grok")
