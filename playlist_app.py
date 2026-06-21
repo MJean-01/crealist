@@ -1,32 +1,29 @@
 import streamlit as st
 import spotipy
-from spotipy.oauth2 import SpotifyOAuth
+from spotipy.oauth2 import SpotifyClientCredentials
 import pyperclip
 import webbrowser
 
 st.set_page_config(page_title="Grok Playlist", page_icon="🎵")
 
 st.title("🎵 Grok Playlist Creator")
-st.write("Escolha o gênero e gere sua playlist")
+st.write("Gera playlists sem complicação")
 
-# ================= SUAS CREDENCIAIS =================
+# ================= CREDENCIAIS =================
 CLIENT_ID = "8a48218f1d5948e3b4e32f2461574df0"
 CLIENT_SECRET = "ba27eb8411de4a6e89f327cea6cb1e88"
-REDIRECT_URI = "http://127.0.0.1:8888/callback"
 
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
+sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
     client_id=CLIENT_ID,
-    client_secret=CLIENT_SECRET,
-    redirect_uri=REDIRECT_URI,
-    scope="user-library-read"
+    client_secret=CLIENT_SECRET
 ))
 
 genero = st.text_input("Gênero musical", value="trap")
-quantidade = st.slider("Quantidade de músicas", 5, 40, 20)
+quantidade = st.slider("Quantidade de músicas", 5, 50, 20)
 
 if st.button("🔥 Gerar Playlist", type="primary"):
     with st.spinner(f"Buscando {quantidade} músicas de {genero}..."):
-        results = sp.search(q=genero, type="track", limit=quantidade + 10)
+        results = sp.search(q=genero, type="track", limit=quantidade + 15)
         
         tracks = results['tracks']['items']
         seen = set()
@@ -56,7 +53,7 @@ if st.button("🔥 Gerar Playlist", type="primary"):
             if st.button("🚀 Abrir Spotify"):
                 webbrowser.open(f"https://open.spotify.com/search/{genero}")
             
-            st.info("Abra o Spotify → Crie uma playlist nova → Cole os links (Ctrl + V)")
+            st.info("Abra o Spotify → Crie uma playlist nova → Cole os links")
         else:
             st.error("Não encontrei músicas.")
 
